@@ -32,7 +32,8 @@ export const BookingConfirmationEmail = ({
     bookingId,
     subdomain,
 }: BookingEmailProps) => {
-    const itineraryUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/tenants/${subdomain}/itinerary/${bookingId}`;
+    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, "");
+    const itineraryUrl = `${baseUrl}/tenants/${subdomain}/itinerary/${bookingId}`;
 
     return (
         <Html>

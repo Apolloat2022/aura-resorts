@@ -4,13 +4,20 @@ import { neon } from "@neondatabase/serverless";
 
 const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
 
+// Helper to extract host from URL
+const appUrlHost = process.env.NEXT_PUBLIC_APP_URL
+    ? new URL(process.env.NEXT_PUBLIC_APP_URL).host
+    : null;
+
 // Allowed base domains (prevent host header injection)
 const ALLOWED_DOMAINS = [
     "localhost:3000",
     "aire.com",
     "www.aire.com",
-    process.env.NEXT_PUBLIC_BASE_DOMAIN || "localhost:3000"
-];
+    "vercel.app",
+    process.env.NEXT_PUBLIC_BASE_DOMAIN,
+    appUrlHost
+].filter(Boolean) as string[];
 
 export default clerkMiddleware(async (auth, req) => {
     const { userId, redirectToSignIn } = await auth();
@@ -33,10 +40,28 @@ export default clerkMiddleware(async (auth, req) => {
         return new NextResponse("Invalid host", { status: 400 });
     }
 
-    const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || "localhost:3000";
+    // Determine the base domain (e.g., aire.com or aura-resorts.vercel.app)
+    let baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || appUrlHost;
 
-    const subdomain = host.endsWith(baseDomain)
-        ? host.replace(`.${baseDomain}`, "").replace(baseDomain, "")
+    if (!baseDomain) {
+        if (host.includes("localhost")) {
+            baseDomain = "localhost:3000";
+        } else if (host.endsWith(".vercel.app")) {
+            // Logic for Vercel: base domain is the root deployment (e.g., myapp.vercel.app)
+            const parts = host.split(".");
+            // If it's partner1.myapp.vercel.app, length is 4. baseDomain is index 1,2,3
+            if (parts.length > 3) {
+                baseDomain = parts.slice(1).join(".");
+            } else {
+                baseDomain = host;
+            }
+        } else {
+            baseDomain = host;
+        }
+    }
+
+    const subdomain = host.endsWith(baseDomain) && host !== baseDomain
+        ? host.replace(`.${baseDomain}`, "")
         : "";
 
     // If subdomain exists, validate it against database

@@ -3,12 +3,13 @@ import { db } from '@/db';
 import { partners } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
-export const generateMetadata = async ({ params }: { params: { subdomain: string } }): Promise<Metadata> => {
+export const generateMetadata = async ({ params }: { params: Promise<{ subdomain: string }> }): Promise<Metadata> => {
+    const { subdomain } = await params;
     // Fetch partner record to get logo and name
     const [partner] = await db
         .select({ name: partners.subdomain, logo: partners.logoUrl })
         .from(partners)
-        .where(eq(partners.subdomain, params.subdomain))
+        .where(eq(partners.subdomain, subdomain))
         .limit(1);
 
     const title = `${partner?.name ?? 'Partner'} – Curated Travel`;

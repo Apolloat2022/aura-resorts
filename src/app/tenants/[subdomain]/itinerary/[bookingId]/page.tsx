@@ -4,14 +4,14 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 interface ItineraryPageProps {
-    params: {
+    params: Promise<{
         subdomain: string;
         bookingId: string;
-    };
+    }>;
 }
 
 export default async function ItineraryPage({ params }: ItineraryPageProps) {
-    const { subdomain, bookingId } = params;
+    const { subdomain, bookingId } = await params;
 
     // 1. Fetch Booking with Resort and Partner details
     const [booking] = await db
