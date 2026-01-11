@@ -184,25 +184,54 @@ export default async function DashboardPage() {
                                 </form>
 
                                 <div className="pt-6 border-t border-slate-800 space-y-4">
-                                    <div className="space-y-2">
-                                        <label className="text-sm text-slate-400 flex justify-between">
+                                    <div className="space-y-3">
+                                        <label className="text-sm text-slate-400 flex justify-between items-center">
                                             Payout Status
-                                            <span className="text-green-500 flex items-center gap-1">
-                                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                                                Active
+                                            <span className={`flex items-center gap-1.5 font-bold text-xs uppercase tracking-wider ${partner.payoutsEnabled ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                                <div className={`w-2 h-2 rounded-full ${partner.payoutsEnabled ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                                                {partner.payoutsEnabled ? 'Active' : 'Action Required'}
                                             </span>
                                         </label>
-                                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs text-slate-500 font-mono">
+
+                                        {!partner.payoutsEnabled && (
+                                            <form action={async () => {
+                                                "use server";
+                                                const { createStripeOnboardingLink } = await import("@/actions/partner");
+                                                await createStripeOnboardingLink();
+                                            }}>
+                                                <button
+                                                    type="submit"
+                                                    className="w-full bg-emerald-600/10 border border-emerald-600/30 text-emerald-400 hover:bg-emerald-600/20 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                    </svg>
+                                                    Complete Onboarding
+                                                </button>
+                                            </form>
+                                        )}
+
+                                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-[10px] text-slate-500 font-mono break-all opacity-60">
                                             {partner.stripeAccountId}
                                         </div>
                                     </div>
+
                                     <div className="pt-6 border-t border-slate-800 space-y-2">
-                                        <label className="text-sm text-slate-400">Email Testing</label>
-                                        <TestEmailButton />
+                                        <label className="text-sm text-slate-400">System Integration</label>
+                                        <div className="grid grid-cols-1 gap-3">
+                                            <TestEmailButton />
+                                            <a
+                                                href="https://dashboard.stripe.com"
+                                                target="_blank"
+                                                className="w-full border border-slate-700 hover:bg-slate-800 text-slate-300 hover:text-white font-medium py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                </svg>
+                                                Stripe Dashboard
+                                            </a>
+                                        </div>
                                     </div>
-                                    <button className="w-full border border-slate-700 hover:bg-slate-800 text-white font-medium py-2 rounded-lg transition-all text-sm">
-                                        Stripe Dashboard
-                                    </button>
                                 </div>
                             </div>
                         </div>

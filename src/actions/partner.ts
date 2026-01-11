@@ -53,7 +53,41 @@ export async function getPartnerData() {
     if (!userId) return null;
 
     const [partner] = await db.select().from(partners).where(eq(partners.userId, userId)).limit(1);
-    return partner || null;
+    if (!partner) return null;
+
+    let payoutsEnabled = false;
+    let onboardingComplete = false;
+
+    if (partner.stripeAccountId && !partner.stripeAccountId.startsWith('acct_1placeholder')) {
+        try {
+            const account = await stripe.accounts.retrieve(partner.stripeAccountId);
+            payoutsEnabled = account.payouts_enabled;
+            onboardingComplete = account.details_submitted;
+        } catch (error) {
+            console.error("[STRIPE] Failed to retrieve account status:", error);
+        }
+    }
+
+    return {
+        ...partner,
+        payoutsEnabled,
+        onboardingComplete
+    };
+}
+
+export async function createStripeOnboardingLink() {
+    const partner = await getPartnerData();
+    if (!partner || !partner.stripeAccountId) throw new Error("Partner or Stripe Account not found");
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const accountLink = await stripe.accountLinks.create({
+        account: partner.stripeAccountId,
+        refresh_url: `${appUrl}/dashboard`,
+        return_url: `${appUrl}/dashboard`,
+        type: "account_onboarding",
+    });
+
+    redirect(accountLink.url);
 }
 
 export async function updatePartnerSettings(formData: FormData) {
