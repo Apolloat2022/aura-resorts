@@ -38,7 +38,14 @@ export default function Home() {
           </Link>
 
           <a
-            href="http://partner1.localhost:3000"
+            href={(() => {
+              const url = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+              const cleanUrl = url.replace(/\/$/, "");
+              // Replace host with subdomain host
+              const urlObj = new URL(cleanUrl);
+              urlObj.host = `partner1.${urlObj.host}`;
+              return urlObj.toString();
+            })()}
             target="_blank"
             className="px-8 py-4 border-2 border-white/30 backdrop-blur-md text-white font-bold rounded-full hover:bg-white/10 transition-all"
           >

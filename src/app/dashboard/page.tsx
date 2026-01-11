@@ -121,14 +121,25 @@ export default async function DashboardPage() {
                                 <div className="space-y-4">
                                     <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-2">
                                         <div className="flex items-center justify-between">
-                                            <code className="text-cyan-400 text-sm font-mono">{partner.subdomain}.localhost:3000</code>
-                                            <a
-                                                href={`http://${partner.subdomain}.localhost:3000`}
-                                                target="_blank"
-                                                className="text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs transition-colors"
-                                            >
-                                                Open
-                                            </a>
+                                            {(() => {
+                                                const url = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+                                                const host = new URL(url).host;
+                                                const storefrontUrlStr = `${partner.subdomain}.${host}`;
+                                                const fullUrl = `${new URL(url).protocol}//${storefrontUrlStr}`;
+
+                                                return (
+                                                    <>
+                                                        <code className="text-cyan-400 text-sm font-mono">{storefrontUrlStr}</code>
+                                                        <a
+                                                            href={fullUrl}
+                                                            target="_blank"
+                                                            className="text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs transition-colors"
+                                                        >
+                                                            Open
+                                                        </a>
+                                                    </>
+                                                );
+                                            })()}
                                         </div>
                                     </div>
                                 </div>
