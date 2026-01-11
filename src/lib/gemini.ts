@@ -1,3 +1,13 @@
+/**
+ * AIRE Reasoning & Itinerary Generation Module
+ * 
+ * Core logic for the AI-Concierge that leverages Gemini 2.0 Flash to synthesize 
+ * bespoke, luxury-themed 5-day itineraries tailored to specific resorts, 
+ * family dynamics (including kids' ages), and partner-specific brand tones.
+ * 
+ * Handles reasoning orchestration, prompt engineering for luxury aesthetics, 
+ * response parsing, and provides a stable fallback mechanism for high availability.
+ */
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");

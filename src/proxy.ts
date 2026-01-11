@@ -1,3 +1,13 @@
+/**
+ * AIRE Request Proxy & Multi-Tenancy Orchestrator
+ * 
+ * High-level orchestration for request interception, authentication protection, 
+ * and secure multi-tenant routing. Dynamically validates partner subdomains 
+ * against the database and performs safe URL rewriting to isolated tenant routes.
+ * 
+ * Provides production-hardened security against host header injection and 
+ * handles environment-specific fallback logic for Vercel and local development.
+ */
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
