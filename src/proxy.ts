@@ -20,6 +20,13 @@ const ALLOWED_DOMAINS = [
 ].filter(Boolean) as string[];
 
 export default clerkMiddleware(async (auth, req) => {
+    const url = req.nextUrl;
+
+    // Prevent circular rewrites if path already starts with /tenants
+    if (url.pathname.startsWith("/tenants/")) {
+        return NextResponse.next();
+    }
+
     const { userId, redirectToSignIn } = await auth();
 
     // Protect dashboard routes
@@ -27,7 +34,6 @@ export default clerkMiddleware(async (auth, req) => {
         return redirectToSignIn();
     }
 
-    const url = req.nextUrl;
     const host = req.headers.get("host") || "";
 
     // Security: Validate host header against allowlist

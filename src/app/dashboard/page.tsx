@@ -123,9 +123,19 @@ export default async function DashboardPage() {
                                         <div className="flex items-center justify-between">
                                             {(() => {
                                                 const url = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-                                                const host = new URL(url).host;
-                                                const storefrontUrlStr = `${partner.subdomain}.${host}`;
-                                                const fullUrl = `${new URL(url).protocol}//${storefrontUrlStr}`;
+                                                const urlObj = new URL(url);
+                                                const isVercel = urlObj.hostname.endsWith(".vercel.app");
+
+                                                let storefrontUrlStr;
+                                                let fullUrl;
+
+                                                if (isVercel) {
+                                                    storefrontUrlStr = `${urlObj.host}/tenants/${partner.subdomain}`;
+                                                    fullUrl = `${urlObj.protocol}//${storefrontUrlStr}`;
+                                                } else {
+                                                    storefrontUrlStr = `${partner.subdomain}.${urlObj.host}`;
+                                                    fullUrl = `${urlObj.protocol}//${storefrontUrlStr}`;
+                                                }
 
                                                 return (
                                                     <>

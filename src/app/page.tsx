@@ -41,8 +41,15 @@ export default function Home() {
             href={(() => {
               const url = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
               const cleanUrl = url.replace(/\/$/, "");
-              // Replace host with subdomain host
               const urlObj = new URL(cleanUrl);
+
+              // If we're on a .vercel.app domain, use path-based routing for the demo
+              // because Vercel doesn't support wildcard sub-subdomains on .vercel.app
+              if (urlObj.hostname.endsWith(".vercel.app")) {
+                return `${cleanUrl}/tenants/partner1`;
+              }
+
+              // Otherwise (localhost or custom domain), use subdomains
               urlObj.host = `partner1.${urlObj.host}`;
               return urlObj.toString();
             })()}
